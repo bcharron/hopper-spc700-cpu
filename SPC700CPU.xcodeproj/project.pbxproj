@@ -1,0 +1,275 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		85A924041975F53C008F3BDA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A924031975F53C008F3BDA /* CoreFoundation.framework */; };
+		85A9240A1975F53C008F3BDA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85A924081975F53C008F3BDA /* InfoPlist.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		85A924001975F53C008F3BDA /* SPC700CPU.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPC700CPU.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		85A924031975F53C008F3BDA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		85A924071975F53C008F3BDA /* SPC700CPU-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SPC700CPU-Info.plist"; sourceTree = "<group>"; };
+		85A924091975F53C008F3BDA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		85A9240B1975F53C008F3BDA /* SPC700CPU-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPC700CPU-Prefix.pch"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		85A923FD1975F53C008F3BDA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A924041975F53C008F3BDA /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		85A923F71975F53B008F3BDA = {
+			isa = PBXGroup;
+			children = (
+				85A924051975F53C008F3BDA /* SPC700CPU */,
+				85A924021975F53C008F3BDA /* Frameworks */,
+				85A924011975F53C008F3BDA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		85A924011975F53C008F3BDA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85A924001975F53C008F3BDA /* SPC700CPU.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		85A924021975F53C008F3BDA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				85A924031975F53C008F3BDA /* CoreFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		85A924051975F53C008F3BDA /* SPC700CPU */ = {
+			isa = PBXGroup;
+			children = (
+				85A924061975F53C008F3BDA /* Supporting Files */,
+			);
+			path = SPC700CPU;
+			sourceTree = "<group>";
+		};
+		85A924061975F53C008F3BDA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				85A924071975F53C008F3BDA /* SPC700CPU-Info.plist */,
+				85A924081975F53C008F3BDA /* InfoPlist.strings */,
+				85A9240B1975F53C008F3BDA /* SPC700CPU-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		85A923FF1975F53C008F3BDA /* SPC700CPU */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85A9240E1975F53C008F3BDA /* Build configuration list for PBXNativeTarget "SPC700CPU" */;
+			buildPhases = (
+				85A923FC1975F53C008F3BDA /* Sources */,
+				85A923FD1975F53C008F3BDA /* Frameworks */,
+				85A923FE1975F53C008F3BDA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SPC700CPU;
+			productName = SPC700CPU;
+			productReference = 85A924001975F53C008F3BDA /* SPC700CPU.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		85A923F81975F53B008F3BDA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Benjamin Charron";
+			};
+			buildConfigurationList = 85A923FB1975F53B008F3BDA /* Build configuration list for PBXProject "SPC700CPU" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 85A923F71975F53B008F3BDA;
+			productRefGroup = 85A924011975F53C008F3BDA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				85A923FF1975F53C008F3BDA /* SPC700CPU */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		85A923FE1975F53C008F3BDA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A9240A1975F53C008F3BDA /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85A923FC1975F53C008F3BDA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		85A924081975F53C008F3BDA /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				85A924091975F53C008F3BDA /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		85A9240C1975F53C008F3BDA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		85A9240D1975F53C008F3BDA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		85A9240F1975F53C008F3BDA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SPC700CPU/SPC700CPU-Prefix.pch";
+				INFOPLIST_FILE = "SPC700CPU/SPC700CPU-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		85A924101975F53C008F3BDA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SPC700CPU/SPC700CPU-Prefix.pch";
+				INFOPLIST_FILE = "SPC700CPU/SPC700CPU-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85A923FB1975F53B008F3BDA /* Build configuration list for PBXProject "SPC700CPU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85A9240C1975F53C008F3BDA /* Debug */,
+				85A9240D1975F53C008F3BDA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85A9240E1975F53C008F3BDA /* Build configuration list for PBXNativeTarget "SPC700CPU" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85A9240F1975F53C008F3BDA /* Debug */,
+				85A924101975F53C008F3BDA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 85A923F81975F53B008F3BDA /* Project object */;
+}
