@@ -1,0 +1,256 @@
+ADC (X), (Y)	 (X) = (X)+(Y)+C	99	NV–H-ZC	1	5
+ADC A, #i	 A = A+i+C	88	NV–H-ZC	2	2
+ADC A, (X)	 A = A+(X)+C	86	NV–H-ZC	1	3
+ADC A, [d]+Y	 A = A+([d]+Y)+C	97	NV–H-ZC	2	6
+ADC A, [d+X]	 A = A+([d+X])+C	87	NV–H-ZC	2	6
+ADC A, d	 A = A+(d)+C	84	NV–H-ZC	2	3
+ADC A, d+X	 A = A+(d+X)+C	94	NV–H-ZC	2	4
+ADC A, !a	 A = A+(a)+C	85	NV–H-ZC	3	4
+ADC A, !a+X	 A = A+(a+X)+C	95	NV–H-ZC	3	5
+ADC A, !a+Y	 A = A+(a+Y)+C	96	NV–H-ZC	3	5
+ADC dd, ds	 (dd) = (dd)+(d)+C	89	NV–H-ZC	3	6
+ADC d, #i	 (d) = (d)+i+C	98	NV–H-ZC	3	5
+ADDW YA, d	 YA = YA + (d), H on high byte	7A	NV–H-ZC	2	5
+AND (X), (Y)	 (X) = (X) & (Y)	39	N—–Z-	1	5
+AND A, #i	 A = A & i	28	N—–Z-	2	2
+AND A, (X)	 A = A & (X)	26	N—–Z-	1	3
+AND A, [d]+Y	 A = A & ([d]+Y)	37	N—–Z-	2	6
+AND A, [d+X]	 A = A & ([d+X])	27	N—–Z-	2	6
+AND A, d	 A = A & (d)	24	N—–Z-	2	3
+AND A, d+X	 A = A & (d+X)	34	N—–Z-	2	4
+AND A, !a	 A = A & (a)	25	N—–Z-	3	4
+AND A, !a+X	 A = A & (a+X)	35	N—–Z-	3	5
+AND A, !a+Y	 A = A & (a+Y)	36	N—–Z-	3	5
+AND dd, ds	 (dd) = (dd) & (ds)	29	N—–Z-	3	6
+AND d, #i	 (d) = (d) & i	38	N—–Z-	3	5
+AND1 C, /m.b	 C = C & ~(m.b)	6A	——-C	3	4
+AND1 C, m.b	 C = C & (m.b)	4A	——-C	3	4
+ASL A	 Left shift A: high->C, 0->low	1C	N—–ZC	1	2
+ASL d	 Left shift (d) as above	0B	N—–ZC	2	4
+ASL d+X	 Left shift (d+X) as above	1B	N—–ZC	2	5
+ASL !a	 Left shift (a) as above	0C	N—–ZC	3	5
+BBC d.0, r	 PC+=r if d.0 == 0	13	——–	3	5/7
+BBC d.1, r	 PC+=r if d.1 == 0	33	——–	3	5/7
+BBC d.2, r	 PC+=r if d.2 == 0	53	——–	3	5/7
+BBC d.3, r	 PC+=r if d.3 == 0	73	——–	3	5/7
+BBC d.4, r	 PC+=r if d.4 == 0	93	——–	3	5/7
+BBC d.5, r	 PC+=r if d.5 == 0	B3	——–	3	5/7
+BBC d.6, r	 PC+=r if d.6 == 0	D3	——–	3	5/7
+BBC d.7, r	 PC+=r if d.7 == 0	F3	——–	3	5/7
+BBS d.0, r	 PC+=r if d.0 == 1	03	——–	3	5/7
+BBS d.1, r	 PC+=r if d.1 == 1	23	——–	3	5/7
+BBS d.2, r	 PC+=r if d.2 == 1	43	——–	3	5/7
+BBS d.3, r	 PC+=r if d.3 == 1	63	——–	3	5/7
+BBS d.4, r	 PC+=r if d.4 == 1	83	——–	3	5/7
+BBS d.5, r	 PC+=r if d.5 == 1	A3	——–	3	5/7
+BBS d.6, r	 PC+=r if d.6 == 1	C3	——–	3	5/7
+BBS d.7, r	 PC+=r if d.7 == 1	E3	——–	3	5/7
+BCC r	 PC+=r if C == 0	90	——–	2	2/4
+BCS r	 PC+=r if C == 1	B0	——–	2	2/4
+BEQ r	 PC+=r if Z == 1	F0	——–	2	2/4
+BMI r	 PC+=r if N == 1	30	——–	2	2/4
+BNE r	 PC+=r if Z == 0	D0	——–	2	2/4
+BPL r	 PC+=r if N == 0	10	——–	2	2/4
+BVC r	 PC+=r if V == 0	50	——–	2	2/4
+BVS r	 PC+=r if V == 1	70	——–	2	2/4
+BRA r	 PC+=r	2F	——–	2	4
+BRK	 Push PC and Flags, PC = [$FFDE]	0F	—1-0–	1	8
+CALL !a	 (SP--)=PCh, (SP--)=PCl, PC=a	3F	——–	3	8
+CBNE d+X, r	 CMP A, (d+X) then BNE	DE	——–	3	6/8
+CBNE d, r	 CMP A, (d) then BNE	2E	——–	3	5/7
+CLR1 d.0	 d.0 = 0	12	——–	2	4
+CLR1 d.1	 d.1 = 0	32	——–	2	4
+CLR1 d.2	 d.2 = 0	52	——–	2	4
+CLR1 d.3	 d.3 = 0	72	——–	2	4
+CLR1 d.4	 d.4 = 0	92	——–	2	4
+CLR1 d.5	 d.5 = 0	B2	——–	2	4
+CLR1 d.6	 d.6 = 0	D2	——–	2	4
+CLR1 d.7	 d.7 = 0	F2	——–	2	4
+CLRC	 C = 0	60	——-0	1	2
+CLRP	 P = 0	20	–0—–	1	2
+CLRV	 V = 0, H = 0	E0	-0–0—	1	2
+CMP (X), (Y)	 (X) - (Y)	79	N—–ZC	1	5
+CMP A, #i	 A - i	68	N—–ZC	2	2
+CMP A, (X)	 A - (X)	66	N—–ZC	1	3
+CMP A, [d]+Y	 A - ([d]+Y)	77	N—–ZC	2	6
+CMP A, [d+X]	 A - ([d+X])	67	N—–ZC	2	6
+CMP A, d	 A - (d)	64	N—–ZC	2	3
+CMP A, d+X	 A - (d+X)	74	N—–ZC	2	4
+CMP A, !a	 A - (a)	65	N—–ZC	3	4
+CMP A, !a+X	 A - (a+X)	75	N—–ZC	3	5
+CMP A, !a+Y	 A - (a+Y)	76	N—–ZC	3	5
+CMP X, #i	 X - i	C8	N—–ZC	2	2
+CMP X, d	 X - (d)	3E	N—–ZC	2	3
+CMP X, !a	 X - (a)	1E	N—–ZC	3	4
+CMP Y, #i	 Y - i	AD	N—–ZC	2	2
+CMP Y, d	 Y - (d)	7E	N—–ZC	2	3
+CMP Y, !a	 Y - (a)	5E	N—–ZC	3	4
+CMP dd, ds	 (dd) - (ds)	69	N—–ZC	3	6
+CMP d, #i	 (d) - i	78	N—–ZC	3	5
+CMPW YA, d	 YA - (d)	5A	N—–ZC	2	4
+DAA A	 decimal adjust for addition	DF	N—–ZC	1	3
+DAS A	 decimal adjust for subtraction	BE	N—–ZC	1	3
+DBNZ Y, r	 Y-- then JNZ	FE	——–	2	4/6
+DBNZ d, r	 (d)-- then JNZ	6E	——–	3	5/7
+DEC A	 A--	9C	N—–Z-	1	2
+DEC X	 X--	1D	N—–Z-	1	2
+DEC Y	 Y--	DC	N—–Z-	1	2
+DEC d	 (d)--	8B	N—–Z-	2	4
+DEC d+X	 (d+X)--	9B	N—–Z-	2	5
+DEC !a	 (a)--	8C	N—–Z-	3	5
+DECW d	 Word (d)--	1A	N—–Z-	2	6
+DI	 I = 0	C0	—–0–	1	3
+DIV YA, X	 A=YA/X, Y=mod(YA,X)	9E	NV–H-Z-	1	12
+EI	 I = 1	A0	—–1–	1	3
+EOR (X), (Y)	 (X) = (X) EOR (Y)	59	N—–Z-	1	5
+EOR A, #i	 A = A EOR i	48	N—–Z-	2	2
+EOR A, (X)	 A = A EOR (X)	46	N—–Z-	1	3
+EOR A, [d]+Y	 A = A EOR ([d]+Y)	57	N—–Z-	2	6
+EOR A, [d+X]	 A = A EOR ([d+X])	47	N—–Z-	2	6
+EOR A, d	 A = A EOR (d)	44	N—–Z-	2	3
+EOR A, d+X	 A = A EOR (d+X)	54	N—–Z-	2	4
+EOR A, !a	 A = A EOR (a)	45	N—–Z-	3	4
+EOR A, !a+X	 A = A EOR (a+X)	55	N—–Z-	3	5
+EOR A, !a+Y	 A = A EOR (a+Y)	56	N—–Z-	3	5
+EOR dd, ds	 (dd) = (dd) EOR (ds)	49	N—–Z-	3	6
+EOR d, #i	 (d) = (d) EOR i	58	N—–Z-	3	5
+EOR1 C, m.b	 C = C EOR (m.b)	8A	——-C	3	5
+INC A	 A++	BC	N—–Z-	1	2
+INC X	 X++	3D	N—–Z-	1	2
+INC Y	 Y++	FC	N—–Z-	1	2
+INC d	 (d)++	AB	N—–Z-	2	4
+INC d+X	 (d+X)++	BB	N—–Z-	2	5
+INC !a	 (a)++	AC	N—–Z-	3	5
+INCW d	 Word (d)++	3A	N—–Z-	2	6
+JMP [!a+X]	 PC = [a+X]	1F	——–	3	6
+JMP !a	 PC = a	5F	——–	3	3
+LSR A	 Right shift A: 0->high, low->C	5C	N—–ZC	1	2
+LSR d	 Right shift (d) as above	4B	N—–ZC	2	4
+LSR d+X	 Right shift (d+X) as above	5B	N—–ZC	2	5
+LSR !a	 Right shift (a) as above	4C	N—–ZC	3	5
+MOV (X)+, A	 (X++) = A (no read)	AF	——–	1	4
+MOV (X), A	 (X) = A (read)	C6	——–	1	4
+MOV [d]+Y, A	 ([d]+Y) = A (read)	D7	——–	2	7
+MOV [d+X], A	 ([d+X]) = A (read)	C7	——–	2	7
+MOV A, #i	 A = i	E8	N—–Z-	2	2
+MOV A, (X)	 A = (X)	E6	N—–Z-	1	3
+MOV A, (X)+	 A = (X++)	BF	N—–Z-	1	4
+MOV A, [d]+Y	 A = ([d]+Y)	F7	N—–Z-	2	6
+MOV A, [d+X]	 A = ([d+X])	E7	N—–Z-	2	6
+MOV A, X	 A = X	7D	N—–Z-	1	2
+MOV A, Y	 A = Y	DD	N—–Z-	1	2
+MOV A, d	 A = (d)	E4	N—–Z-	2	3
+MOV A, d+X	 A = (d+X)	F4	N—–Z-	2	4
+MOV A, !a	 A = (a)	E5	N—–Z-	3	4
+MOV A, !a+X	 A = (a+X)	F5	N—–Z-	3	5
+MOV A, !a+Y	 A = (a+Y)	F6	N—–Z-	3	5
+MOV SP, X	 SP = X	BD	——–	1	2
+MOV X, #i	 X = i	CD	N—–Z-	2	2
+MOV X, A	 X = A	5D	N—–Z-	1	2
+MOV X, SP	 X = SP	9D	N—–Z-	1	2
+MOV X, d	 X = (d)	F8	N—–Z-	2	3
+MOV X, d+Y	 X = (d+Y)	F9	N—–Z-	2	4
+MOV X, !a	 X = (a)	E9	N—–Z-	3	4
+MOV Y, #i	 Y = i	8D	N—–Z-	2	2
+MOV Y, A	 Y = A	FD	N—–Z-	1	2
+MOV Y, d	 Y = (d)	EB	N—–Z-	2	3
+MOV Y, d+X	 Y = (d+X)	FB	N—–Z-	2	4
+MOV Y, !a	 Y = (a)	EC	N—–Z-	3	4
+MOV dd, ds	 (dd) = (ds) (no read)	FA	——–	3	5
+MOV d+X, A	 (d+X) = A (read)	D4	——–	2	5
+MOV d+X, Y	 (d+X) = Y (read)	DB	——–	2	5
+MOV d+Y, X	 (d+Y) = X (read)	D9	——–	2	5
+MOV d, #i	 (d) = i (read)	8F	——–	3	5
+MOV d, A	 (d) = A (read)	C4	——–	2	4
+MOV d, X	 (d) = X (read)	D8	——–	2	4
+MOV d, Y	 (d) = Y (read)	CB	——–	2	4
+MOV !a+X, A	 (a+X) = A (read)	D5	——–	3	6
+MOV !a+Y, A	 (a+Y) = A (read)	D6	——–	3	6
+MOV !a, A	 (a) = A (read)	C5	——–	3	5
+MOV !a, X	 (a) = X (read)	C9	——–	3	5
+MOV !a, Y	 (a) = Y (read)	CC	——–	3	5
+MOV1 C, m.b	 C = (m.b)	AA	——-C	3	4
+MOV1 m.b, C	 (m.b) = C	CA	——–	3	6
+MOVW YA, d	 YA = word (d)	BA	N—–Z-	2	5
+MOVW d, YA	 word (d) = YA (read low only)	DA	——–	2	5
+MUL YA	 YA = Y * A, NZ on Y only	CF	N—–Z-	1	9
+NOP	 do nothing	00	——–	1	2
+NOT1 m.b	 m.b = ~m.b	EA	——–	3	5
+NOTC	 C = !C	ED	——-C	1	3
+OR (X), (Y)	(X) = (X) | (Y)	19	N—–Z-	1	5
+OR A, #i	A = A | i	08	N—–Z-	2	2
+OR A, (X)	A = A | (X)	06	N—–Z-	1	3
+OR A, [d]+Y	A = A | ([d]+Y)	17	N—–Z-	2	6
+OR A, [d+X]	A = A | ([d+X])	07	N—–Z-	2	6
+OR A, d	A = A | (d)	04	N—–Z-	2	3
+OR A, d+X	A = A | (d+X)	14	N—–Z-	2	4
+OR A, !a	A = A | (a)	05	N—–Z-	3	4
+OR A, !a+X	A = A | (a+X)	15	N—–Z-	3	5
+OR A, !a+Y	A = A | (a+Y)	16	N—–Z-	3	5
+OR dd, ds	(dd) = (dd) | (ds)	09	N—–Z-	3	6
+OR d, #i	(d) = (d) | i	18	N—–Z-	3	5
+OR1 C, /m.b	C = C | ~(m.b)	2A	——-C	3	5
+OR1 C, m.b	C = C | (m.b)	0A	——-C	3	5
+PCALL u	 CALL $FF00+u	4F	——–	2	6
+POP A	 A = (++SP)	AE	——–	1	4
+POP PSW	 Flags = (++SP)	8E	NVPBHIZC	1	4
+POP X	 X = (++SP)	CE	——–	1	4
+POP Y	 Y = (++SP)	EE	——–	1	4
+PUSH A	 (SP--) = A	2D	——–	1	4
+PUSH PSW	 (SP--) = Flags	0D	——–	1	4
+PUSH X	 (SP--) = X	4D	——–	1	4
+PUSH Y	 (SP--) = Y	6D	——–	1	4
+RET	 Pop PC	6F	——–	1	5
+RETI	 Pop Flags, PC	7F	NVPBHIZC	1	6
+ROL A	 Left shift A: low=C, C=high	3C	N—–ZC	1	2
+ROL d	 Left shift (d) as above	2B	N—–ZC	2	4
+ROL d+X	 Left shift (d+X) as above	3B	N—–ZC	2	5
+ROL !a	 Left shift (a) as above	2C	N—–ZC	3	5
+ROR A	 Right shift A: high=C, C=low	7C	N—–ZC	1	2
+ROR d	 Right shift (d) as above	6B	N—–ZC	2	4
+ROR d+X	 Right shift (d+X) as above	7B	N—–ZC	2	5
+ROR !a	 Right shift (a) as above	6C	N—–ZC	3	5
+SBC (X), (Y)	 (X) = (X)-(Y)-!C	B9	NV–H-ZC	1	5
+SBC A, #i	 A = A-i-!C	A8	NV–H-ZC	2	2
+SBC A, (X)	 A = A-(X)-!C	A6	NV–H-ZC	1	3
+SBC A, [d]+Y	 A = A-([d]+Y)-!C	B7	NV–H-ZC	2	6
+SBC A, [d+X]	 A = A-([d+X])-!C	A7	NV–H-ZC	2	6
+SBC A, d	 A = A-(d)-!C	A4	NV–H-ZC	2	3
+SBC A, d+X	 A = A-(d+X)-!C	B4	NV–H-ZC	2	4
+SBC A, !a	 A = A-(a)-!C	A5	NV–H-ZC	3	4
+SBC A, !a+X	 A = A-(a+X)-!C	B5	NV–H-ZC	3	5
+SBC A, !a+Y	 A = A-(a+Y)-!C	B6	NV–H-ZC	3	5
+SBC dd, ds	 (dd) = (dd)-(ds)-!C	A9	NV–H-ZC	3	6
+SBC d, #i	 (d) = (d)-i-!C	B8	NV–H-ZC	3	5
+SET1 d.0	 d.0 = 1	02	——–	2	4
+SET1 d.1	 d.1 = 1	22	——–	2	4
+SET1 d.2	 d.2 = 1	42	——–	2	4
+SET1 d.3	 d.3 = 1	62	——–	2	4
+SET1 d.4	 d.4 = 1	82	——–	2	4
+SET1 d.5	 d.5 = 1	A2	——–	2	4
+SET1 d.6	 d.6 = 1	C2	——–	2	4
+SET1 d.7	 d.7 = 1	E2	——–	2	4
+SETC	 C = 1	80	——-1	1	2
+SETP	 P = 1	40	–1—–	1	2
+SLEEP	 Halts the processor	EF	——–	1	?
+STOP	 Halts the processor	FF	——–	1	?
+SUBW YA, d	 YA = YA - (d), H on high byte	9A	NV–H-ZC	2	5
+TCALL 0	 CALL [$FFDE]	01	——–	1	8
+TCALL 1	 CALL [$FFDC]	11	——–	1	8
+TCALL 2	 CALL [$FFDA]	21	——–	1	8
+TCALL 3	 CALL [$FFD8]	31	——–	1	8
+TCALL 4	 CALL [$FFD6]	41	——–	1	8
+TCALL 5	 CALL [$FFD4]	51	——–	1	8
+TCALL 6	 CALL [$FFD2]	61	——–	1	8
+TCALL 7	 CALL [$FFD0]	71	——–	1	8
+TCALL 8	 CALL [$FFCE]	81	——–	1	8
+TCALL 9	 CALL [$FFCC]	91	——–	1	8
+TCALL 10	 CALL [$FFCA]	A1	——–	1	8
+TCALL 11	 CALL [$FFC8]	B1	——–	1	8
+TCALL 12	 CALL [$FFC6]	C1	——–	1	8
+TCALL 13	 CALL [$FFC4]	D1	——–	1	8
+TCALL 14	 CALL [$FFC2]	E1	——–	1	8
+TCALL 15	 CALL [$FFC0]	F1	——–	1	8
+TCLR1 !a	 (a) = (a)&~A, ZN as for A-(a)	4E	N—–Z-	3	6
+TSET1 !a	(a) = (a)|A, ZN as for A-(a)	0E	N—–Z-	3	6
+XCN A	A = (A>>4) | (A<<4)	9F	N—–Z-	1	5
