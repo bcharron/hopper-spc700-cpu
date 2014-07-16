@@ -130,9 +130,11 @@ extern spc700_opcode_t SPC700_OPCODES[];
         case 0x10:
         case 0xFE:
             ret = TRUE;
+            break;
             
         default:
             ret = FALSE;
+            break;
     }
     
     return(ret);
