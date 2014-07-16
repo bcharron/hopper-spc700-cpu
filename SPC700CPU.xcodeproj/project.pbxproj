@@ -9,14 +9,37 @@
 /* Begin PBXBuildFile section */
 		85A924041975F53C008F3BDA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A924031975F53C008F3BDA /* CoreFoundation.framework */; };
 		85A9240A1975F53C008F3BDA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85A924081975F53C008F3BDA /* InfoPlist.strings */; };
+		85A924131975F919008F3BDA /* SPC700CPU.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A924121975F919008F3BDA /* SPC700CPU.m */; };
+		85A924161975FA45008F3BDA /* SPC700Ctx.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A924151975FA45008F3BDA /* SPC700Ctx.m */; };
+		85A9241919760947008F3BDA /* opcodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 85A9241719760947008F3BDA /* opcodes.c */; };
+		85A9241B19762331008F3BDA /* SPC700CPU.hopperCPU in CopyFiles */ = {isa = PBXBuildFile; fileRef = 85A924001975F53C008F3BDA /* SPC700CPU.hopperCPU */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		85A9241A19761FB9008F3BDA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(HOME)/Library/Application Support/Hopper/PlugIns/CPUs";
+			dstSubfolderSpec = 0;
+			files = (
+				85A9241B19762331008F3BDA /* SPC700CPU.hopperCPU in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		85A924001975F53C008F3BDA /* SPC700CPU.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPC700CPU.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		85A924001975F53C008F3BDA /* SPC700CPU.hopperCPU */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPC700CPU.hopperCPU; sourceTree = BUILT_PRODUCTS_DIR; };
 		85A924031975F53C008F3BDA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		85A924071975F53C008F3BDA /* SPC700CPU-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SPC700CPU-Info.plist"; sourceTree = "<group>"; };
 		85A924091975F53C008F3BDA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		85A9240B1975F53C008F3BDA /* SPC700CPU-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPC700CPU-Prefix.pch"; sourceTree = "<group>"; };
+		85A924111975F919008F3BDA /* SPC700CPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPC700CPU.h; sourceTree = "<group>"; };
+		85A924121975F919008F3BDA /* SPC700CPU.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPC700CPU.m; sourceTree = "<group>"; };
+		85A924141975FA45008F3BDA /* SPC700Ctx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPC700Ctx.h; sourceTree = "<group>"; };
+		85A924151975FA45008F3BDA /* SPC700Ctx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPC700Ctx.m; sourceTree = "<group>"; };
+		85A9241719760947008F3BDA /* opcodes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = opcodes.c; sourceTree = "<group>"; };
+		85A9241819760947008F3BDA /* opcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opcodes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +66,7 @@
 		85A924011975F53C008F3BDA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				85A924001975F53C008F3BDA /* SPC700CPU.bundle */,
+				85A924001975F53C008F3BDA /* SPC700CPU.hopperCPU */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,7 +82,13 @@
 		85A924051975F53C008F3BDA /* SPC700CPU */ = {
 			isa = PBXGroup;
 			children = (
+				85A9241719760947008F3BDA /* opcodes.c */,
+				85A9241819760947008F3BDA /* opcodes.h */,
 				85A924061975F53C008F3BDA /* Supporting Files */,
+				85A924111975F919008F3BDA /* SPC700CPU.h */,
+				85A924121975F919008F3BDA /* SPC700CPU.m */,
+				85A924141975FA45008F3BDA /* SPC700Ctx.h */,
+				85A924151975FA45008F3BDA /* SPC700Ctx.m */,
 			);
 			path = SPC700CPU;
 			sourceTree = "<group>";
@@ -84,6 +113,7 @@
 				85A923FC1975F53C008F3BDA /* Sources */,
 				85A923FD1975F53C008F3BDA /* Frameworks */,
 				85A923FE1975F53C008F3BDA /* Resources */,
+				85A9241A19761FB9008F3BDA /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -91,7 +121,7 @@
 			);
 			name = SPC700CPU;
 			productName = SPC700CPU;
-			productReference = 85A924001975F53C008F3BDA /* SPC700CPU.bundle */;
+			productReference = 85A924001975F53C008F3BDA /* SPC700CPU.hopperCPU */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -136,6 +166,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85A924161975FA45008F3BDA /* SPC700Ctx.m in Sources */,
+				85A9241919760947008F3BDA /* opcodes.c in Sources */,
+				85A924131975F919008F3BDA /* SPC700CPU.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,12 +260,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPC700CPU/SPC700CPU-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../include,
+				);
 				INFOPLIST_FILE = "SPC700CPU/SPC700CPU-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				INSTALL_PATH = "$(HOME)/Library/Application Support/Hopper/PlugIns/CPUs";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = hopperCPU;
 			};
 			name = Debug;
 		};
@@ -240,12 +279,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPC700CPU/SPC700CPU-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../include,
+				);
 				INFOPLIST_FILE = "SPC700CPU/SPC700CPU-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				INSTALL_PATH = "$(HOME)/Library/Application Support/Hopper/PlugIns/CPUs";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = hopperCPU;
 			};
 			name = Release;
 		};
