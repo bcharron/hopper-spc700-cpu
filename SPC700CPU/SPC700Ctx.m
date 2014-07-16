@@ -159,16 +159,65 @@ extern spc700_opcode_t SPC700_OPCODES[];
     
     strcpy(disasm->instruction.mnemonic, inst->mnemonic);
     
-    if (strlen(inst->operand1) > 0) {
-        strcpy(disasm->operand1.mnemonic, inst->operand1);
-        disasm->operand1.type = DISASM_OPERAND_REGISTER_TYPE;
-    }
+    for (int op = 0; op < 2; op++) {
+        strcpy(disasm->operand[op].mnemonic, inst->operand[op].mnemonic);
 
-    if (strlen(inst->operand2) > 0) {
-        strcpy(disasm->operand2.mnemonic, inst->operand2);
-        disasm->operand2.type = DISASM_OPERAND_REGISTER_TYPE;
+        switch(inst->operand[op].access_type) {
+            case SPC_ACCESS_ABSOLUTE:
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE;
+                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
+                break;
+                
+            case SPC_ACCESS_ABSOLUTE_X:
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+X)", (uint16_t) disasm->instruction.addressValue);
+                break;
+
+            case SPC_ACCESS_ABSOLUTE_Y:
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+Y)", (uint16_t) disasm->instruction.addressValue);
+                break;
+                
+            case SPC_ACCESS_ABSOLUTE_INDIRECT_X:
+                // Wrong
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+X)", (uint16_t) disasm->instruction.addressValue);
+                break;
+
+            case SPC_ACCESS_REGISTER:
+                disasm->operand[op].type = DISASM_OPERAND_REGISTER_TYPE;
+                break;
+                
+            case SPC_ACCESS_IMMEDIATE:
+                disasm->operand[op].type = DISASM_OPERAND_CONSTANT_TYPE;
+                disasm->operand[op].immediatValue = disasm->bytes[op + 1];
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[op + 1]);
+                break;
+
+            case SPC_ACCESS_ZERO_PAGE:
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE;
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X", disasm->bytes[op + 1]);
+                break;
+                
+            case SPC_ACCESS_ZERO_PAGE_X:
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X+X", disasm->bytes[op + 1]);
+                break;
+                
+            case SPC_ACCESS_NO_OPERAND:
+                disasm->operand[op].type = DISASM_OPERAND_NO_OPERAND;
+                break;
+                
+            default:
+                disasm->operand[op].type = DISASM_OPERAND_REGISTER_TYPE;
+                break;
+        }
     }
-    
+        
     if ([self isBranch:opcode]) {
         // Banches
         switch (opcode) {
@@ -322,17 +371,19 @@ extern spc700_opcode_t SPC700_OPCODES[];
 - (void)buildInstructionString:(DisasmStruct *)disasm forSegment:(NSObject<HPSegment> *)segment populatingInfo:(NSObject<HPFormattedInstructionInfo> *)formattedInstructionInfo {
     
     const char *spaces = "       ";
-    strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
+    
+    snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "%-10s", disasm->instruction.mnemonic);
+//    strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
     
     strcat(disasm->completeInstructionString, spaces);
     
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
         if (disasm->operand[i].type == DISASM_OPERAND_NO_OPERAND) break;
-        if (i) {
-            if (disasm->operand[i].type == DISASM_OPERAND_REGISTER_TYPE)
-                strcat(disasm->completeInstructionString, ",");
-            else
-                strcat(disasm->completeInstructionString, " ");
+        if (i >= 1) {
+//            if (disasm->operand[i].type == DISASM_OPERAND_REGISTER_TYPE)
+                strcat(disasm->completeInstructionString, ", ");
+  //          else
+    //            strcat(disasm->completeInstructionString, " ");
         }
         
         if (disasm->operand[i].type == DISASM_OPERAND_ABSOLUTE) {

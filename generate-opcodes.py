@@ -4,17 +4,67 @@ import sys
 
 # Note: "!a" seems to mean "absolute address"
 
-STRUCT_FMT = """\t/* {opcode} */ {{ "{mnemonic}", "{operand1}", "{operand2}", 0x{opcode}, {len} }}"""
+STRUCT_FMT = """\t/* {opcode} */ {{ "{mnemonic}", {{ {operand1}, {operand2} }}, 0x{opcode}, {len} }}"""
+
+OPERAND_FMT = """{{ "{mnemonic}", {access_type}, {register_name} }}"""
+
+ACCESS_TYPES = {
+	"A" : "SPC_ACCESS_REGISTER",
+	"X" : "SPC_ACCESS_REGISTER",
+	"Y" : "SPC_ACCESS_REGISTER",
+	"PSW" : "SPC_ACCESS_REGISTER",
+	"#i" : "SPC_ACCESS_IMMEDIATE",
+	"d" : "SPC_ACCESS_ZERO_PAGE",
+	"dd" : "SPC_ACCESS_ZERO_PAGE",
+	"ds" : "SPC_ACCESS_ZERO_PAGE",
+	"d+X" : "SPC_ACCESS_ZERO_PAGE_X",
+	"(X)" : "SPC_ACCESS_INDIRECT_X",
+	"(Y)" : "SPC_ACCESS_INDIRECT_Y",
+	"!a" : "SPC_ACCESS_ABSOLUTE",
+	"!a+X" : "SPC_ACCESS_ABSOLUTE_X",
+	"!a+Y" : "SPC_ACCESS_ABSOLUTE_Y",
+	"[!a+X]" : "SPC_ACCESS_ABSOLUTE_INDIRECT_X"
+}
+
+REGISTER_NAMES = {
+	"A" : "SPC_REGISTER_A",
+	"X" : "SPC_REGISTER_X",
+	"Y" : "SPC_REGISTER_Y",
+	"(X)" : "SPC_REGISTER_X",
+	"(Y)" : "SPC_REGISTER_Y",
+	"PSW" : "SPC_REGISTER_PSW"
+}
 
 class Instruction(object):
 	def __init__(self, mnemonic, operands, opcode, inst_len):
 		self.opcode = opcode
 		self.mnemonic = mnemonic
-		self.operands = operands
 		self.len = inst_len
+		self.operands = []
+
+		for index, operand in enumerate(operands):
+			op = self.createOperand(operand)
+			self.operands.append(op)
 
 		while len(self.operands) < 2:
-			self.operands.append("")
+			self.operands.append(Operand(None, None, None))
+
+	def createOperand(self, operand):
+		op = Operand(None, None, None)
+
+		if not operand == "":
+			access_type = "SPC_ACCESS_REGISTER"
+			register_name = "SPC_REGISTER_A"
+
+			if operand in ACCESS_TYPES:
+				access_type = ACCESS_TYPES[operand]
+
+			if operand in REGISTER_NAMES:
+				register_name = REGISTER_NAMES[operand]
+
+			op = Operand(operand, access_type, register_name)
+
+		return(op)
 
 	def dump_struct(self):
 		string = STRUCT_FMT.format(mnemonic = self.mnemonic,
@@ -24,6 +74,24 @@ class Instruction(object):
 					operand2 = self.operands[1])
 
 		return(string)
+
+class Operand(object):
+	def __init__(self, mnemonic, access_type, register_name):
+		self.mnemonic = mnemonic
+		self.access_type = access_type
+		self.register_name = register_name
+
+		if access_type is None:
+			self.access_type = "SPC_ACCESS_NO_OPERAND"
+			self.register_name = "SPC_REGISTER_A"
+			self.mnemonic = ""
+
+	def __str__(self):
+		ret = OPERAND_FMT.format(mnemonic = self.mnemonic,
+					access_type = self.access_type,
+					register_name = self.register_name)
+
+		return(ret)
 
 instructions = [Instruction("BAD", [], i, 1) for i in range(0, 256)]
 
