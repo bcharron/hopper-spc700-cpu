@@ -44,7 +44,7 @@ for line in sys.stdin:
 	operands = mnemonic_fields
 
 	for i in range(len(operands)):
-		operands[i] = operands[i].strip()
+		operands[i] = operands[i].strip().rstrip(",")
 
 	# print "%s" % mnemonic
 

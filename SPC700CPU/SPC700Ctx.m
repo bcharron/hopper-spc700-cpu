@@ -119,6 +119,7 @@ extern spc700_opcode_t SPC700_OPCODES[];
     BOOL ret;
     
     switch(opcode) {
+        case 0x10:
         case 0x2F:
         case 0xF0:
         case 0xD0:
@@ -127,7 +128,6 @@ extern spc700_opcode_t SPC700_OPCODES[];
         case 0x70:
         case 0x50:
         case 0x30:
-        case 0x10:
         case 0xFE:
             ret = TRUE;
             break;
@@ -226,8 +226,12 @@ extern spc700_opcode_t SPC700_OPCODES[];
     // Special cases
     switch(opcode) {
         case 0x1F:  // JMP [!a+X]
+            disasm->instruction.branchType = DISASM_BRANCH_JMP;
+            break;
+            
         case 0x5F:  // JMP [!a]s
             disasm->instruction.branchType = DISASM_BRANCH_JMP;
+            disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
             break;
             
         case 0x6F:  // RET
@@ -236,6 +240,7 @@ extern spc700_opcode_t SPC700_OPCODES[];
             break;
             
         case 0x3F:  // CALL
+            disasm->instruction.branchType = DISASM_BRANCH_CALL;
             disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
             break;
             

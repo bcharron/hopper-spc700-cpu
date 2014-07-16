@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "85A923FF1975F53C008F3BDA"
-               BuildableName = "SPC700CPU.bundle"
+               BuildableName = "SPC700CPU.hopperCPU"
                BlueprintName = "SPC700CPU"
                ReferencedContainer = "container:SPC700CPU.xcodeproj">
             </BuildableReference>
