@@ -328,7 +328,7 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
             
         case 0x5F:  // JMP [!a]s
             disasm->instruction.branchType = DISASM_BRANCH_JMP;
-            disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+            disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             break;
             
         case 0x6F:  // RET
@@ -338,7 +338,7 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
             
         case 0x3F:  // CALL
             disasm->instruction.branchType = DISASM_BRANCH_CALL;
-            disasm->instruction.addressValue = disasm->bytes[2] << 8 | disasm->bytes[1];
+            disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             break;
             
         case 0x4F:  // PCALL u
