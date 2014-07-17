@@ -140,6 +140,21 @@ extern spc700_opcode_t SPC700_OPCODES[];
     return(ret);
 }
 
+/*
+void do_a_zp(uint8_t opcode, DisasmStruct *disasm) {
+    strcpy(disasm->operand[0].mnemonic, "A");
+    disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+    
+    disasm->operand[1].type = DISASM_OPERAND_ABSOLUTE;
+    snprintf(disasm->operand[1].mnemonic, 15, "$00%02X", disasm->bytes[1]);
+}
+
+void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
+    do_zp(opcode, disasm);
+    strcat(disasm->operand[1].mnemonic, "+X");
+}
+*/
+
 /// Disassemble a single instruction, filling the DisasmStruct structure.
 /// Only a few fields are set by Hopper (mainly, the syntaxIndex, the "bytes" field and the virtualAddress of the instruction).
 /// The CPU should fill as much information as possible.
@@ -159,32 +174,36 @@ extern spc700_opcode_t SPC700_OPCODES[];
     
     strcpy(disasm->instruction.mnemonic, inst->mnemonic);
     
+    int nb_bytes = inst->len - 1;
+    
+    // XXX: this is currently incorrect. ie, opcode 0x8F (MOV $zero_page, #imm) is translated in reverse.
+    // and "MOV X, #imm" is using the wrong immediate value. So in short all this is broken :-/
     for (int op = 0; op < 2; op++) {
         strcpy(disasm->operand[op].mnemonic, inst->operand[op].mnemonic);
 
         switch(inst->operand[op].access_type) {
             case SPC_ACCESS_ABSOLUTE:
                 disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE;
-                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
                 snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
                 break;
                 
             case SPC_ACCESS_ABSOLUTE_X:
                 disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
                 snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+X)", (uint16_t) disasm->instruction.addressValue);
                 break;
 
             case SPC_ACCESS_ABSOLUTE_Y:
                 disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
                 snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+Y)", (uint16_t) disasm->instruction.addressValue);
                 break;
                 
             case SPC_ACCESS_ABSOLUTE_INDIRECT_X:
                 // Wrong
                 disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                disasm->instruction.addressValue = ((uint16_t) disasm->bytes[2] << 8) | disasm->bytes[1];
+                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
                 snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+X)", (uint16_t) disasm->instruction.addressValue);
                 break;
 
@@ -194,22 +213,34 @@ extern spc700_opcode_t SPC700_OPCODES[];
                 
             case SPC_ACCESS_IMMEDIATE:
                 disasm->operand[op].type = DISASM_OPERAND_CONSTANT_TYPE;
-                disasm->operand[op].immediatValue = disasm->bytes[op + 1];
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[op + 1]);
+                disasm->operand[op].immediatValue = disasm->bytes[nb_bytes];
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[nb_bytes]);
+                nb_bytes--;
                 break;
 
             case SPC_ACCESS_ZERO_PAGE:
                 disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE;
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X", disasm->bytes[op + 1]);
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X", disasm->bytes[nb_bytes]);
+                disasm->instruction.addressValue = disasm->bytes[nb_bytes];
+                nb_bytes--;
                 break;
                 
             case SPC_ACCESS_ZERO_PAGE_X:
                 disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X+X", disasm->bytes[op + 1]);
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X+X", disasm->bytes[nb_bytes]);
+                nb_bytes--;
                 break;
                 
             case SPC_ACCESS_NO_OPERAND:
                 disasm->operand[op].type = DISASM_OPERAND_NO_OPERAND;
+                break;
+                
+            case SPC_ACCESS_INDIRECT_ZERO_PAGE_Y:
+                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($00%02X)+Y", disasm->bytes[nb_bytes]);
+                // disasm->instruction.addressValue = [_file readInt16AtVirtualAddress:disasm->bytes[nb_bytes]];
+                // disasm->instruction.addressValue = disasm->bytes[nb_bytes];
+                nb_bytes--;
                 break;
                 
             default:
@@ -300,9 +331,108 @@ extern spc700_opcode_t SPC700_OPCODES[];
             disasm->instruction.addressValue = ((uint16_t) h << 8) | l;
             break;
             
+        /*
+        case 0x8F: // MOV $ZP, #imm
+            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+            strcpy(disasm->operand[0].mnemonic, "X");
+            
+            disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE;
+            snprintf(disasm->operand[1].mnemonic, 10, "#$%02X", disasm->bytes[1]);
+            break;
+            
+        case 0xCD: // MOV X, #imm. Parser is broken :(
+            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+            strcpy(disasm->operand[0].mnemonic, "X");
+
+            disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE;
+            snprintf(disasm->operand[1].mnemonic, 10, "#$%02X", disasm->bytes[1]);
+            break;
+         */
+            
         default:
             break;
     }
+    
+    /*
+    switch(opcode) {
+        case 0x04:
+            do_a_zp(opcode, disasm);
+            break;
+
+        case 0x14:
+            do_a_zp_plus_x(opcode, disasm);
+            break;
+            
+        case 0x24:
+            do_a_zp(opcode, disasm);
+            break;
+            
+        case 0x44:
+        case 0x64:
+        case 0x84:
+        case 0xA4:
+        case 0xE4:
+            strcpy(disasm->operand[0].mnemonic, "A");
+            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+            
+            disasm->operand[1].type = DISASM_OPERAND_ABSOLUTE;
+            snprintf(disasm->operand[1].mnemonic, 15, "$00%02X", disasm->bytes[1]);
+            break;
+            
+        case 0xC4:
+            
+        case 0x14: // OP A, $ZP+X
+        case 0x34:
+        case 0x54:
+        case 0x74:
+        case 0x94:
+        case 0xB4:
+        case 0xD4:
+            strcpy(disasm->operand[0].mnemonic, "A");
+            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+            
+            disasm->operand[1].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
+            snprintf(disasm->operand[1].mnemonic, 15, "$00%02X+X", disasm->bytes[1]);
+            break;
+
+    }
+    */
+    
+    /*
+    // OP  A, $ZP
+    if ((opcode & 0x0E) == 0x04) {
+        int zp_operand = 1;
+        int a_operand = 0;
+        
+        // C4 and D4 (MOV) are "STA" (direction inversed)
+        if (opcode == 0xC4 || opcode == 0xD4) {
+            zp_operand = 0;
+            a_operand = 1;
+        }
+        
+        disasm->operand[zp_operand].type = DISASM_OPERAND_ABSOLUTE;
+        
+        // Bit 0 is memory location:   1:word (absolute)   0:byte (zero-page)
+        if (opcode & 0x01)
+            snprintf(disasm->operand[zp_operand].mnemonic, 15, "$%04X", OSReadLittleInt16(disasm->bytes, 1));
+        else
+            snprintf(disasm->operand[zp_operand].mnemonic, 15, "$00%02X", disasm->bytes[1]);
+        
+        strcpy(disasm->operand[a_operand].mnemonic, "A");
+        disasm->operand[a_operand].type = DISASM_OPERAND_REGISTER_TYPE;
+        
+        if ((opcode & 0x01) == 0x01) {
+            strcat(disasm->operand[zp_operand].mnemonic, "+X");
+            disasm->operand[zp_operand].type |= DISASM_OPERAND_REGISTER_TYPE;
+        }
+    } else if ((opcode & 0x08) == 0x08 && (opcode & 0x10) == 0x00) { // OP  A, #i
+        strcpy(disasm->operand[0].mnemonic, "A");
+        disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+        
+        snprintf(disasm->operand[1].mnemonic, 15, "#$%02X", disasm->bytes[1]);
+        disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE;
+    }
+     */
     
     // TCALL
     if ((opcode & 0x0F) == 0x01) {
@@ -369,29 +499,33 @@ extern spc700_opcode_t SPC700_OPCODES[];
 /// Build the complete instruction string in the DisasmStruct structure.
 /// This is the string to be displayed in Hopper.
 - (void)buildInstructionString:(DisasmStruct *)disasm forSegment:(NSObject<HPSegment> *)segment populatingInfo:(NSObject<HPFormattedInstructionInfo> *)formattedInstructionInfo {
-    
-    const char *spaces = "       ";
-    
-    snprintf(disasm->completeInstructionString, DISASM_INSTRUCTION_MAX_LENGTH, "%-10s", disasm->instruction.mnemonic);
-//    strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
-    
-    strcat(disasm->completeInstructionString, spaces);
+    NSMutableString *output = [NSMutableString stringWithFormat:@"%-10s", disasm->instruction.mnemonic];
     
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
         if (disasm->operand[i].type == DISASM_OPERAND_NO_OPERAND) break;
+        
         if (i >= 1) {
-//            if (disasm->operand[i].type == DISASM_OPERAND_REGISTER_TYPE)
-                strcat(disasm->completeInstructionString, ", ");
-  //          else
-    //            strcat(disasm->completeInstructionString, " ");
+            [output appendString:@", "];
         }
         
-        if (disasm->operand[i].type == DISASM_OPERAND_ABSOLUTE) {
-            // Find the variable name here. Shouldn't Hopper do that?
-            //            [formattedInstructionInfo ]
+        NSString *temp = [[NSString alloc] initWithCString:disasm->operand[i].mnemonic encoding:NSUTF8StringEncoding];
+        
+        if (disasm->operand[i].type & ( DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_RELATIVE)) {
+            ArgFormat format = [_file formatForArgument:i atVirtualAddress:disasm->instruction.addressValue];
+            
+            if (format == Format_Address || format == Format_Offset || format == Format_Default) {
+                NSString *name = [_file nameForVirtualAddress:disasm->instruction.addressValue];
+            
+                if (name != NULL) {
+                    temp = name;
+                }
+            }
         }
-        strcat(disasm->completeInstructionString, disasm->operand[i].mnemonic);
+
+        [output appendString:temp];
     }
+    
+    strncpy(disasm->completeInstructionString, [output cStringUsingEncoding:NSUTF8StringEncoding], DISASM_INSTRUCTION_MAX_LENGTH - 1);
 }
 
 // Decompiler
