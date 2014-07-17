@@ -115,6 +115,10 @@ for line in sys.stdin:
 	line = line.strip()
 	fields = line.split("\t")
 
+	# Ignore comments
+	if line.startswith("#"):
+		continue
+
 	for x in range(len(fields)):
 		fields[x] = fields[x].strip()
 

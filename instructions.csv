@@ -1,3 +1,5 @@
+# This file taken from the awesome resource at
+# http://wiki.superfamicom.org/snes/show/SPC700+Reference
 ADC (X), (Y)	 (X) = (X)+(Y)+C	99	NV–H-ZC	1	5
 ADC A, #i	 A = A+i+C	88	NV–H-ZC	2	2
 ADC A, (X)	 A = A+(X)+C	86	NV–H-ZC	1	3
