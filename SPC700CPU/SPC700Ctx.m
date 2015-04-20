@@ -59,6 +59,18 @@ extern spc700_opcode_t SPC700_OPCODES[];
 
 // Analysis
 
+- (BOOL)displacementIsAnArgument:(int64_t)displacement forProcedure:(NSObject<HPProcedure> *)procedure {
+    return NO;
+}
+
+- (NSUInteger)stackArgumentSlotForDisplacement:(int64_t)displacement inProcedure:(NSObject<HPProcedure> *)procedure {
+    return -1;
+}
+
+- (int64_t)displacementForStackSlotIndex:(NSUInteger)slot inProcedure:(NSObject<HPProcedure> *)procedure {
+    return 0;
+}
+
 /// Adjust address to the lowest possible address acceptable by the CPU. Example: M68000 instruction must be word aligned, so this method would clear bit 0.
 - (Address)adjustCodeAddress:(Address)address {
     // Nothing to do? 6502 doesn't care..
@@ -87,7 +99,7 @@ extern spc700_opcode_t SPC700_OPCODES[];
     return (address + 1);
 }
 
-- (BOOL)haveProcedurePrologAt:(Address)address {
+- (BOOL)hasProcedurePrologAt:(Address)address {
     // There isn't usually much prolog to a function in NES games.
     return(FALSE);
 }
@@ -123,6 +135,10 @@ extern spc700_opcode_t SPC700_OPCODES[];
 /// A new basic bloc is created
 - (void)procedureAnalysisContinuesOnBasicBlock:(NSObject<HPBasicBlock> *)basicBlock {
     
+}
+
+- (Address)getThunkDestinationForInstructionAt:(Address)address {
+    return BAD_ADDRESS;
 }
 
 /// This method may be called when the internal state of the disassembler should be reseted.
@@ -230,7 +246,7 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
                 
             case SPC_ACCESS_IMMEDIATE:
                 disasm->operand[op].type = DISASM_OPERAND_CONSTANT_TYPE;
-                disasm->operand[op].immediatValue = disasm->bytes[nb_bytes];
+                disasm->operand[op].immediateValue = disasm->bytes[nb_bytes];
                 snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[nb_bytes]);
                 nb_bytes--;
                 break;
@@ -314,10 +330,10 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
         }
         
         disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
-        disasm->operand1.immediatValue = disasm->instruction.addressValue;
-        disasm->operand1.type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+        disasm->operand[0].immediateValue = disasm->instruction.addressValue;
+        disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
         
-        snprintf(disasm->operand1.mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
+        snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
     }
 
     // Special cases
@@ -482,7 +498,7 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
 /// The purpose of this method is to compute additional destinations.
 /// Most of the time, Hopper already found the destinations, so there is no need to do more.
 /// This is used by the Intel CPU plugin to compute the destinations of switch/case constructions when it found a "JMP register" instruction.
-- (void)performBranchesAnalysis:(DisasmStruct *)disasm computingNextAddress:(Address *)next andBranches:(NSMutableArray *)branches forProcedure:(NSObject<HPProcedure> *)procedure basicBlock:(NSObject<HPBasicBlock> *)basicBlock ofSegment:(NSObject<HPSegment> *)segment callsites:(NSMutableArray *)callSitesAddresses {
+- (void)performBranchesAnalysis:(DisasmStruct *)disasm computingNextAddress:(Address *)next andBranches:(NSMutableArray *)branches forProcedure:(NSObject<HPProcedure> *)procedure basicBlock:(NSObject<HPBasicBlock> *)basicBlock ofSegment:(NSObject<HPSegment> *)segment calledAddresses:(NSMutableArray *)calledAddresses callsites:(NSMutableArray *)callSitesAddresses {
     
 }
 
@@ -507,6 +523,10 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
 // Printing instruction
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+- (NSString *)defaultFormattedVariableNameForDisplacement:(int64_t)displacement inProcedure:(NSObject<HPProcedure> *)procedure {
+    return [NSString stringWithFormat:@"var%lld", displacement];
+}
 
 /// The method should return a default name for a local variable at a given displacement on stack.
 - (NSString *)formattedVariableNameForDisplacement:(int64_t)displacement inProcedure:(NSObject<HPProcedure> *)procedure {
@@ -592,6 +612,14 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
 
 - (NSData *)assembleRawInstruction:(NSString *)instr atAddress:(Address)addr forFile:(NSObject<HPDisassembledFile> *)file withCPUMode:(uint8_t)cpuMode usingSyntaxVariant:(NSUInteger)syntax error:(NSError **)error {
     return nil;
+}
+
+- (BOOL)instructionCanBeUsedToExtractDirectMemoryReferences:(DisasmStruct *)disasmStruct {
+    return YES;
+}
+
+- (BOOL)instructionMayBeASwitchStatement:(DisasmStruct *)disasmStruct {
+    return NO;
 }
 
 @end

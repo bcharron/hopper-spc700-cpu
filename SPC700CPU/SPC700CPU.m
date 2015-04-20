@@ -37,7 +37,7 @@
     return self;
 }
 
-- (UUID *)pluginUUID {
+- (HopperUUID *)pluginUUID {
     return [_services UUIDWithString:@"316efc80-0c7d-11e4-9191-0800200c9a66"];
 }
 - (HopperPluginType)pluginType {
@@ -113,7 +113,7 @@
     return(RegClass_SPC700_Cnt);
 }
 
-- (NSUInteger)registerCountForClass:(NSUInteger)reg_class {
+- (NSUInteger)registerCountForClass:(RegClass)reg_class {
     switch (reg_class) {
         case RegClass_CPUState: return 1;
         case RegClass_PseudoRegisterSTACK: return 32;
@@ -122,6 +122,18 @@
         default: break;
     }
     return 0;
+}
+
+- (BOOL)registerIndexIsStackPointer:(uint32_t)reg ofClass:(RegClass)reg_class {
+    return NO;
+}
+
+- (BOOL)registerIndexIsFrameBasePointer:(uint32_t)reg ofClass:(RegClass)reg_class {
+    return NO;
+}
+
+- (BOOL)registerIndexIsProgramCounter:(uint32_t)reg {
+    return NO;
 }
 
 // Not quite sure what this function should return for GP and Address registers
@@ -168,6 +180,10 @@
     }
     
     return nil;
+}
+
+- (NSString *)cpuRegisterStateMaskToString:(uint32_t)cpuState {
+    return @"";
 }
 
 /// A weirdness of the Hopper internals. You'll usually simply need to return the "index" argument.
