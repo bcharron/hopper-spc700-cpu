@@ -162,6 +162,22 @@ extern spc700_opcode_t SPC700_OPCODES[];
         case 0x50:
         case 0x30:
         case 0xFE:
+        case 0x13: // BBC0
+        case 0x33: // BBC1
+        case 0x53: // BBC2
+        case 0x73: // BBC3
+        case 0x93: // BBC4
+        case 0xB3: // BBC5
+        case 0xD3: // BBC6
+        case 0xF3: // BBC7
+        case 0x03: // BBS0
+        case 0x23: // BBS1
+        case 0x43: // BBS2
+        case 0x63: // BBS3
+        case 0x83: // BBS4
+        case 0xA3: // BBS5
+        case 0xC3: // BBS6
+        case 0xE3: // BBS7
             ret = TRUE;
             break;
             
@@ -325,6 +341,28 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
                 disasm->instruction.branchType = DISASM_BRANCH_JE;
                 break;
 
+            case 0x13: // BBC0
+            case 0x33: // BBC1
+            case 0x53: // BBC2
+            case 0x73: // BBC3
+            case 0x93: // BBC4
+            case 0xB3: // BBC5
+            case 0xD3: // BBC6
+            case 0xF3: // BBC7
+                disasm->instruction.branchType = DISASM_BRANCH_JE; // Can't find a better branch to reprsent BBC
+                break;
+                
+            case 0x03: // BBS0
+            case 0x23: // BBS1
+            case 0x43: // BBS2
+            case 0x63: // BBS3
+            case 0x83: // BBS4
+            case 0xA3: // BBS5
+            case 0xC3: // BBS6
+            case 0xE3: // BBS7
+                disasm->instruction.branchType = DISASM_BRANCH_JE; // Can't find a better branch to reprsent BBS
+                break;
+                
             default:
                 break;
         }

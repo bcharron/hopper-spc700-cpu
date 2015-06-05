@@ -60,7 +60,7 @@
 }
 
 - (NSString *)pluginVersion {
-    return(@"0.1.0");
+    return(@"0.1.1");
 }
 
 - (NSObject<CPUContext> *)buildCPUContextForFile:(NSObject<HPDisassembledFile> *)file {
