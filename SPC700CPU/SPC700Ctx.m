@@ -26,6 +26,7 @@
 #import "SPC700Ctx.h"
 #import "SPC700CPU.h"
 #import "opcodes.h"
+#import "opcodes2.h"
 
 extern spc700_opcode_t SPC700_OPCODES[];
 
@@ -204,100 +205,185 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
 }
 */
 
+// Dump and instruction and return its size in bytes
+int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
+{
+    uint8 opcode = ram[0];
+    opcode_t *op = NULL;
+    int x;
+    
+    // printf("%04X  ", pc);
+    
+    // XXX: Build a table indexed by opcode in Init() and use that instead of searching for every instruction.
+    for (x = 0; x < OPCODE_TABLE_LEN; x++) {
+        if (OPCODE_TABLE[x].opcode == opcode) {
+            op = &OPCODE_TABLE[x];
+            break;
+        }
+    }
+    
+    if (op == NULL) {
+        printf("Unknown opcode: 0x%02X\n", opcode);
+        return(1);
+    }
+    
+    /*
+    for (x = 0; x < op->len; x++)
+        printf("%02X ", ram[pc + x]);
+    
+    // Space padding
+    x = 5 - op->len;
+    while (x-- > 0)
+        printf("   ");
+    */
+    
+    char str[128];
+    
+    switch(op->len) {
+        case 1:
+        {
+            snprintf(str, sizeof(str), "%s", op->name);
+            break;
+        }
+            
+        case 2:
+        {
+            snprintf(str, sizeof(str), op->name, ram[1]);
+            break;
+        }
+            
+        case 3:
+        {
+            switch(opcode) {
+                    // These opcodes need to be displayed "backwards"
+                case 0x03: // BBS0
+                case 0x13: // BBC0
+                case 0x23: // BBS1
+                case 0x2E: // CBNE $dp, $rr
+                case 0x33: // BBC1
+                case 0x43: // BBS2
+                case 0x53: // BBC2
+                case 0x63: // BBS3
+                case 0x6E: // DBNZ $dp, $rr
+                case 0x73: // BBC3
+                case 0x83: // BBS4
+                case 0x93: // BBC4
+                case 0xA3: // BBS5
+                case 0xB3: // BBC5
+                case 0xC3: // BBS6
+                case 0xD3: // BBC6
+                case 0xDE: // CBNE $dp+X, $rr
+                case 0xE3: // BBS7
+                case 0xF3: // BBC7
+                    snprintf(str, sizeof(str), op->name, ram[1], ram[2]);
+                    break;
+                    
+                default:
+                    snprintf(str, sizeof(str), op->name, ram[2], ram[1]);
+                    break;
+            }
+            break;
+        }
+            
+        default:
+        {
+            break;
+        }
+            
+    }
+    
+    // printf("%s", str);
+    strcpy(buf, str);
+    
+    str[0] = '\0';
+    
+    switch(opcode) {
+            // These are inversed compared to other branch opcodes, and
+            // they need to be incremented by 3 rather than 2.
+        case 0x13: // BBC0
+        case 0x2E: // CBNE $dp, $rr
+        case 0x33: // BBC1
+        case 0x53: // BBC2
+        case 0x6E: // DBNZ $dp, $rr
+        case 0x73: // BBC3
+        case 0x93: // BBC4
+        case 0xB3: // BBC5
+        case 0xD3: // BBC6
+        case 0xF3: // BBC7
+        case 0xDE: // CBNE $dp+X, $rr
+        {
+            snprintf(str, sizeof(str), " ($%04X)", pc + 3 + (sint8) ram[2]);
+        }
+        break;
+            
+        case 0x10: // BPL
+        case 0x2F: // BRA
+        case 0x30: // BMI
+        case 0x50: // BVC
+        case 0x70: // BVS
+        case 0x90: // BCC
+        case 0xB0: // BCS
+            
+        case 0xD0: // BNE
+        case 0xF0: // BEQ
+        case 0xFE: // DBNZ
+        {
+            // +2 because the operands have been read when the CPU gets ready to jump
+            snprintf(str, sizeof(str), " ($%04X)", pc + 2 + (sint8) ram[1]);
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+    strcat(buf, str);
+    
+    return(op->len);
+}
+
 /// Disassemble a single instruction, filling the DisasmStruct structure.
 /// Only a few fields are set by Hopper (mainly, the syntaxIndex, the "bytes" field and the virtualAddress of the instruction).
 /// The CPU should fill as much information as possible.
 - (int)disassembleSingleInstruction:(DisasmStruct *)disasm usingProcessorMode:(NSUInteger)mode {
-    
-    int len = 1;
-    
+    char instr[1024];
+
     disasm->instruction.branchType = DISASM_BRANCH_NONE;
     disasm->instruction.addressValue = 0;
     
     for (int i=0; i<DISASM_MAX_OPERANDS; i++)
         disasm->operand[i].type = DISASM_OPERAND_NO_OPERAND;
     
-    uint8_t opcode = disasm->bytes[0];
+    int inst_len = dump_instruction(disasm->virtualAddr, disasm->bytes, instr);
     
-    spc700_opcode_t *inst = &SPC700_OPCODES[opcode];
+    // Routine from 68k sample module
+    char *ptr = instr;
+    char *instrPtr = disasm->instruction.mnemonic;
+    while (*ptr && *ptr != ' ') *instrPtr++ = *ptr++;
+    *instrPtr = 0;
+    while (*ptr == ' ') ptr++;
     
-    strcpy(disasm->instruction.mnemonic, inst->mnemonic);
-    
-    int nb_bytes = inst->len - 1;
-    
-    // XXX: this is currently incorrect. ie, opcode 0x8F (MOV $zero_page, #imm) is translated in reverse.
-    // and "MOV X, #imm" is using the wrong immediate value. So in short all this is broken :-/
-    for (int op = 0; op < 2; op++) {
-        strcpy(disasm->operand[op].mnemonic, inst->operand[op].mnemonic);
-
-        switch(inst->operand[op].access_type) {
-            case SPC_ACCESS_ABSOLUTE:
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE;
-                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
-                break;
-                
-            case SPC_ACCESS_ABSOLUTE_X:
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+X)", (uint16_t) disasm->instruction.addressValue);
-                break;
-
-            case SPC_ACCESS_ABSOLUTE_Y:
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+Y)", (uint16_t) disasm->instruction.addressValue);
-                break;
-                
-            case SPC_ACCESS_ABSOLUTE_INDIRECT_X:
-                // Wrong
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($%04X+X)", (uint16_t) disasm->instruction.addressValue);
-                break;
-
-            case SPC_ACCESS_REGISTER:
-                disasm->operand[op].type = DISASM_OPERAND_REGISTER_TYPE;
-                break;
-                
-            case SPC_ACCESS_IMMEDIATE:
-                disasm->operand[op].type = DISASM_OPERAND_CONSTANT_TYPE;
-                disasm->operand[op].immediateValue = disasm->bytes[nb_bytes];
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "#$%02X", disasm->bytes[nb_bytes]);
-                nb_bytes--;
-                break;
-
-            case SPC_ACCESS_ZERO_PAGE:
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE;
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X", disasm->bytes[nb_bytes]);
-                disasm->instruction.addressValue = disasm->bytes[nb_bytes];
-                nb_bytes--;
-                break;
-                
-            case SPC_ACCESS_ZERO_PAGE_X:
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$00%02X+X", disasm->bytes[nb_bytes]);
-                nb_bytes--;
-                break;
-                
-            case SPC_ACCESS_NO_OPERAND:
-                disasm->operand[op].type = DISASM_OPERAND_NO_OPERAND;
-                break;
-                
-            case SPC_ACCESS_INDIRECT_ZERO_PAGE_Y:
-                disasm->operand[op].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-                snprintf(disasm->operand[op].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "($00%02X)+Y", disasm->bytes[nb_bytes]);
-                // disasm->instruction.addressValue = [_file readInt16AtVirtualAddress:disasm->bytes[nb_bytes]];
-                // disasm->instruction.addressValue = disasm->bytes[nb_bytes];
-                nb_bytes--;
-                break;
-                
-            default:
-                disasm->operand[op].type = DISASM_OPERAND_REGISTER_TYPE;
-                break;
+    int operandIndex = 0;
+    char *operand = disasm->operand[operandIndex].mnemonic;
+    int p_level = 0;
+    while (*ptr) {
+        if (*ptr == ',' && p_level == 0) {
+            *operand = 0;
+            operand = disasm->operand[++operandIndex].mnemonic;
+            ptr++;
+            while (*ptr == ' ') ptr++;
+        }
+        else {
+            if (*ptr == '(') p_level++;
+            if (*ptr == ')') p_level--;
+            *operand++ = *ptr++;
         }
     }
-        
+    
+    *operand = 0;
+
+    uint8_t opcode = disasm->bytes[0];
+    
     if ([self isBranch:opcode]) {
         // Banches
         switch (opcode) {
@@ -370,17 +456,28 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
         disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
         disasm->operand[0].immediateValue = disasm->instruction.addressValue;
         disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+        snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
         
-        snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
+        // snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
     }
 
     // Special cases
     switch(opcode) {
         case 0x1F:  // JMP [!a+X]
-            disasm->instruction.branchType = DISASM_BRANCH_JMP;
-            break;
+        {
+            // XXX: Would probably be better to use the memory displacement
             
-        case 0x5F:  // JMP [!a]s
+            // This jump uses indirection with displacement of X
+            // We obviously don't know X, but we can at least point to the base
+            disasm->instruction.branchType = DISASM_BRANCH_JMP;
+            uint16_t b = OSReadLittleInt16(disasm->bytes, 0x01);
+            uint8_t l = [_file readInt8AtVirtualAddress:b % 65535];
+            uint8_t h = [_file readInt8AtVirtualAddress:(b + 1) % 65535];
+            disasm->instruction.addressValue = ((uint16_t) h << 8) | l;
+        }
+        break;
+            
+        case 0x5F:  // JMP $xxyy
             disasm->instruction.branchType = DISASM_BRANCH_JMP;
             disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             break;
@@ -402,109 +499,11 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
             disasm->instruction.addressValue = ((uint16_t) h << 8) | l;
             break;
             
-        /*
-        case 0x8F: // MOV $ZP, #imm
-            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
-            strcpy(disasm->operand[0].mnemonic, "X");
-            
-            disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE;
-            snprintf(disasm->operand[1].mnemonic, 10, "#$%02X", disasm->bytes[1]);
-            break;
-            
-        case 0xCD: // MOV X, #imm. Parser is broken :(
-            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
-            strcpy(disasm->operand[0].mnemonic, "X");
-
-            disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE;
-            snprintf(disasm->operand[1].mnemonic, 10, "#$%02X", disasm->bytes[1]);
-            break;
-         */
-            
         default:
             break;
     }
     
     /*
-    switch(opcode) {
-        case 0x04:
-            do_a_zp(opcode, disasm);
-            break;
-
-        case 0x14:
-            do_a_zp_plus_x(opcode, disasm);
-            break;
-            
-        case 0x24:
-            do_a_zp(opcode, disasm);
-            break;
-            
-        case 0x44:
-        case 0x64:
-        case 0x84:
-        case 0xA4:
-        case 0xE4:
-            strcpy(disasm->operand[0].mnemonic, "A");
-            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
-            
-            disasm->operand[1].type = DISASM_OPERAND_ABSOLUTE;
-            snprintf(disasm->operand[1].mnemonic, 15, "$00%02X", disasm->bytes[1]);
-            break;
-            
-        case 0xC4:
-            
-        case 0x14: // OP A, $ZP+X
-        case 0x34:
-        case 0x54:
-        case 0x74:
-        case 0x94:
-        case 0xB4:
-        case 0xD4:
-            strcpy(disasm->operand[0].mnemonic, "A");
-            disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
-            
-            disasm->operand[1].type = DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_REGISTER_TYPE;
-            snprintf(disasm->operand[1].mnemonic, 15, "$00%02X+X", disasm->bytes[1]);
-            break;
-
-    }
-    */
-    
-    /*
-    // OP  A, $ZP
-    if ((opcode & 0x0E) == 0x04) {
-        int zp_operand = 1;
-        int a_operand = 0;
-        
-        // C4 and D4 (MOV) are "STA" (direction inversed)
-        if (opcode == 0xC4 || opcode == 0xD4) {
-            zp_operand = 0;
-            a_operand = 1;
-        }
-        
-        disasm->operand[zp_operand].type = DISASM_OPERAND_ABSOLUTE;
-        
-        // Bit 0 is memory location:   1:word (absolute)   0:byte (zero-page)
-        if (opcode & 0x01)
-            snprintf(disasm->operand[zp_operand].mnemonic, 15, "$%04X", OSReadLittleInt16(disasm->bytes, 1));
-        else
-            snprintf(disasm->operand[zp_operand].mnemonic, 15, "$00%02X", disasm->bytes[1]);
-        
-        strcpy(disasm->operand[a_operand].mnemonic, "A");
-        disasm->operand[a_operand].type = DISASM_OPERAND_REGISTER_TYPE;
-        
-        if ((opcode & 0x01) == 0x01) {
-            strcat(disasm->operand[zp_operand].mnemonic, "+X");
-            disasm->operand[zp_operand].type |= DISASM_OPERAND_REGISTER_TYPE;
-        }
-    } else if ((opcode & 0x08) == 0x08 && (opcode & 0x10) == 0x00) { // OP  A, #i
-        strcpy(disasm->operand[0].mnemonic, "A");
-        disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
-        
-        snprintf(disasm->operand[1].mnemonic, 15, "#$%02X", disasm->bytes[1]);
-        disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE;
-    }
-     */
-    
     // TCALL
     if ((opcode & 0x0F) == 0x01) {
         int dest = 0xFFFF - (opcode & 0x0F) * 2;
@@ -513,10 +512,9 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
         uint8_t h = [_file readInt8AtVirtualAddress:dest + 1];
         disasm->instruction.addressValue = ((uint16_t) h << 8) | l;
     }
+    */
     
-    len = inst->len;
-    
-    return(len);
+    return(inst_len);
 }
 
 /// Returns whether or not an instruction may halt the processor (like the HLT Intel instruction).
@@ -574,33 +572,16 @@ void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
 /// Build the complete instruction string in the DisasmStruct structure.
 /// This is the string to be displayed in Hopper.
 - (void)buildInstructionString:(DisasmStruct *)disasm forSegment:(NSObject<HPSegment> *)segment populatingInfo:(NSObject<HPFormattedInstructionInfo> *)formattedInstructionInfo {
-    NSMutableString *output = [NSMutableString stringWithFormat:@"%-10s", disasm->instruction.mnemonic];
     
+    const char *spaces = "                ";
+    
+    strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
+    strcat(disasm->completeInstructionString, spaces + strlen(disasm->instruction.mnemonic));
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
-        if (disasm->operand[i].type == DISASM_OPERAND_NO_OPERAND) break;
-        
-        if (i >= 1) {
-            [output appendString:@", "];
-        }
-        
-        NSString *temp = [[NSString alloc] initWithCString:disasm->operand[i].mnemonic encoding:NSUTF8StringEncoding];
-        
-        if (disasm->operand[i].type & ( DISASM_OPERAND_ABSOLUTE | DISASM_OPERAND_RELATIVE)) {
-            ArgFormat format = [_file formatForArgument:i atVirtualAddress:disasm->instruction.addressValue];
-            
-            if (format == Format_Address || format == Format_Offset || format == Format_Default) {
-                NSString *name = [_file nameForVirtualAddress:disasm->instruction.addressValue];
-            
-                if (name != NULL) {
-                    temp = name;
-                }
-            }
-        }
-
-        [output appendString:temp];
+        if (disasm->operand[i].mnemonic[0] == 0) break;
+        if (i) strcat(disasm->completeInstructionString, ", ");
+        strcat(disasm->completeInstructionString, disasm->operand[i].mnemonic);
     }
-    
-    strncpy(disasm->completeInstructionString, [output cStringUsingEncoding:NSUTF8StringEncoding], DISASM_INSTRUCTION_MAX_LENGTH - 1);
 }
 
 // Decompiler

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8527AD3F1B55E2B3009113B1 /* opcodes2.c in Sources */ = {isa = PBXBuildFile; fileRef = 8527AD3D1B55E2B3009113B1 /* opcodes2.c */; };
 		85A924041975F53C008F3BDA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A924031975F53C008F3BDA /* CoreFoundation.framework */; };
 		85A9240A1975F53C008F3BDA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85A924081975F53C008F3BDA /* InfoPlist.strings */; };
 		85A924131975F919008F3BDA /* SPC700CPU.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A924121975F919008F3BDA /* SPC700CPU.m */; };
@@ -29,6 +30,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8527AD3D1B55E2B3009113B1 /* opcodes2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = opcodes2.c; sourceTree = "<group>"; };
+		8527AD3E1B55E2B3009113B1 /* opcodes2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opcodes2.h; sourceTree = "<group>"; };
 		85A924001975F53C008F3BDA /* SPC700CPU.hopperCPU */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPC700CPU.hopperCPU; sourceTree = BUILT_PRODUCTS_DIR; };
 		85A924031975F53C008F3BDA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		85A924071975F53C008F3BDA /* SPC700CPU-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SPC700CPU-Info.plist"; sourceTree = "<group>"; };
@@ -82,6 +85,8 @@
 		85A924051975F53C008F3BDA /* SPC700CPU */ = {
 			isa = PBXGroup;
 			children = (
+				8527AD3D1B55E2B3009113B1 /* opcodes2.c */,
+				8527AD3E1B55E2B3009113B1 /* opcodes2.h */,
 				85A9241719760947008F3BDA /* opcodes.c */,
 				85A9241819760947008F3BDA /* opcodes.h */,
 				85A924061975F53C008F3BDA /* Supporting Files */,
@@ -168,6 +173,7 @@
 			files = (
 				85A924161975FA45008F3BDA /* SPC700Ctx.m in Sources */,
 				85A9241919760947008F3BDA /* opcodes.c in Sources */,
+				8527AD3F1B55E2B3009113B1 /* opcodes2.c in Sources */,
 				85A924131975F919008F3BDA /* SPC700CPU.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -313,6 +319,7 @@
 				85A924101975F53C008F3BDA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
