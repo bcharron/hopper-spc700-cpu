@@ -390,9 +390,8 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
     uint8_t opcode = disasm->bytes[0];
     
     if ([self isBranch:opcode]) {
-        disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
+        disasm->instruction.addressValue = disasm->virtualAddr + (sint8) disasm->bytes[1] + 2;
         disasm->operand[0].immediateValue = disasm->instruction.addressValue;
-        disasm->operand[0].accessMode = DISASM_ACCESS_READ;
         disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
         snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
         
@@ -446,9 +445,6 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
             case 0xB3: // BBC5
             case 0xD3: // BBC6
             case 0xF3: // BBC7
-                disasm->instruction.branchType = DISASM_BRANCH_JE; // Can't find a better branch to reprsent BBC
-                break;
-                
             case 0x03: // BBS0
             case 0x23: // BBS1
             case 0x43: // BBS2
@@ -457,7 +453,12 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
             case 0xA3: // BBS5
             case 0xC3: // BBS6
             case 0xE3: // BBS7
-                disasm->instruction.branchType = DISASM_BRANCH_JE; // Can't find a better branch to reprsent BBS
+                disasm->instruction.branchType = DISASM_BRANCH_JE; // Can't find a better branch to reprsent BBC
+                disasm->instruction.addressValue = disasm->virtualAddr + (sint8) disasm->bytes[2] + 3;
+                disasm->operand[0].immediateValue = disasm->bytes[1];
+                disasm->operand[1].immediateValue = disasm->instruction.addressValue;
+                snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02x", disasm->bytes[1]);
+                snprintf(disasm->operand[1].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
                 break;
                 
             default:
@@ -494,6 +495,7 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
         case 0x3F:  // CALL
             disasm->instruction.branchType = DISASM_BRANCH_CALL;
             disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
+            disasm->operand[0].immediateValue = disasm->instruction.addressValue;
             break;
             
         case 0x4F:  // PCALL u
