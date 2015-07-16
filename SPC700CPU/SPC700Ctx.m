@@ -159,6 +159,8 @@ extern spc700_opcode_t SPC700_OPCODES[];
     
     switch(opcode) {
         case 0x10:
+        case 0x2E: // CBNE $dp, $rr
+        case 0x6E: // DBNZ $dp, $rr
         case 0x2F:
         case 0xF0:
         case 0xD0:
@@ -175,6 +177,7 @@ extern spc700_opcode_t SPC700_OPCODES[];
         case 0x93: // BBC4
         case 0xB3: // BBC5
         case 0xD3: // BBC6
+        case 0xDE: // CBNE $dp+X, $rr
         case 0xF3: // BBC7
         case 0x03: // BBS0
         case 0x23: // BBS1
@@ -436,7 +439,34 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
             case 0xFE: // BPL
                 disasm->instruction.branchType = DISASM_BRANCH_JE;
                 break;
-
+                
+            case 0x2E: // CBNE $dp, $rr
+            case 0x6E: // DBNZ $dp, $rr
+                disasm->instruction.branchType = DISASM_BRANCH_JNE;
+                disasm->instruction.addressValue = disasm->virtualAddr + (sint8) disasm->bytes[2] + 3;
+                
+                disasm->operand[0].immediateValue = disasm->bytes[1];
+                disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE;
+                snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02x", disasm->bytes[1]);
+                
+                disasm->operand[1].immediateValue = disasm->instruction.addressValue;
+                disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+                snprintf(disasm->operand[1].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
+                break;
+                
+            case 0xDE: // CBNE $dp+X, $rr
+                disasm->instruction.branchType = DISASM_BRANCH_JNE;
+                disasm->instruction.addressValue = disasm->virtualAddr + (sint8) disasm->bytes[2] + 3;
+                
+                disasm->operand[0].immediateValue = disasm->bytes[1];
+                disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE;
+                snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02x+X", disasm->bytes[1]);
+                
+                disasm->operand[1].immediateValue = disasm->instruction.addressValue;
+                disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+                snprintf(disasm->operand[1].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
+                break;
+                
             case 0x13: // BBC0
             case 0x33: // BBC1
             case 0x53: // BBC2
