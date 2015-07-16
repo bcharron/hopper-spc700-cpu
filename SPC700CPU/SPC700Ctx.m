@@ -100,6 +100,11 @@ extern spc700_opcode_t SPC700_OPCODES[];
     return (address + 1);
 }
 
+/// Return 0 if the instruction at this address doesn't represent a NOP instruction (or any padding instruction), or the insturction length if any.
+- (int)isNopAt:(Address)address {
+    return(0);
+}
+
 - (BOOL)hasProcedurePrologAt:(Address)address {
     // There isn't usually much prolog to a function in NES games.
     return(FALSE);
@@ -385,6 +390,12 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
     uint8_t opcode = disasm->bytes[0];
     
     if ([self isBranch:opcode]) {
+        disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
+        disasm->operand[0].immediateValue = disasm->instruction.addressValue;
+        disasm->operand[0].accessMode = DISASM_ACCESS_READ;
+        disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+        snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
+        
         // Banches
         switch (opcode) {
             case 0x2F: // BRA
@@ -452,15 +463,8 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
             default:
                 break;
         }
-        
-        disasm->instruction.addressValue = disasm->virtualAddr + (int8_t) disasm->bytes[1] + 2;
-        disasm->operand[0].immediateValue = disasm->instruction.addressValue;
-        disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
-        snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
-        
-        // snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04X", (uint16_t) disasm->instruction.addressValue);
     }
-
+    
     // Special cases
     switch(opcode) {
         case 0x1F:  // JMP [!a+X]
@@ -535,7 +539,6 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
 /// Most of the time, Hopper already found the destinations, so there is no need to do more.
 /// This is used by the Intel CPU plugin to compute the destinations of switch/case constructions when it found a "JMP register" instruction.
 - (void)performBranchesAnalysis:(DisasmStruct *)disasm computingNextAddress:(Address *)next andBranches:(NSMutableArray *)branches forProcedure:(NSObject<HPProcedure> *)procedure basicBlock:(NSObject<HPBasicBlock> *)basicBlock ofSegment:(NSObject<HPSegment> *)segment calledAddresses:(NSMutableArray *)calledAddresses callsites:(NSMutableArray *)callSitesAddresses {
-    
 }
 
 /// If you need a specific analysis, this method will be called once the previous branch analysis is performed.
@@ -621,6 +624,15 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
                                  addNode_p:(BOOL *)addNode_p
                            usingDecompiler:(Decompiler *)decompiler {
     return nil;
+}
+
+/// Decompile an assembly instruction.
+/// Note: ASTNode is not publicly exposed yet. You cannot write a decompiler at the moment.
+- (ASTNode *)decompileInstructionAtAddress:(Address)a
+                                    disasm:(DisasmStruct)d
+                                 addNode_p:(BOOL *)addNode_p
+                           usingDecompiler:(Decompiler *)decompiler {
+    return(nil);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

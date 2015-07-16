@@ -231,5 +231,9 @@
     return(NO);
 }
 
+// Returns the name of the frame pointer register, ie, "bp" for x86, or "r7" for ARM.
+- (NSString *)framePointerRegisterNameForFile:(NSObject<HPDisassembledFile>*)file {
+    return(nil);
+}
 
 @end
