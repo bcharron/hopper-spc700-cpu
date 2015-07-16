@@ -456,8 +456,11 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
                 disasm->instruction.branchType = DISASM_BRANCH_JE; // Can't find a better branch to reprsent BBC
                 disasm->instruction.addressValue = disasm->virtualAddr + (sint8) disasm->bytes[2] + 3;
                 disasm->operand[0].immediateValue = disasm->bytes[1];
-                disasm->operand[1].immediateValue = disasm->instruction.addressValue;
+                disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE;
                 snprintf(disasm->operand[0].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%02x", disasm->bytes[1]);
+
+                disasm->operand[1].immediateValue = disasm->instruction.addressValue;
+                disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
                 snprintf(disasm->operand[1].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
                 break;
                 
@@ -485,6 +488,7 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
         case 0x5F:  // JMP $xxyy
             disasm->instruction.branchType = DISASM_BRANCH_JMP;
             disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
+            disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
             break;
             
         case 0x6F:  // RET
@@ -496,6 +500,7 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
             disasm->instruction.branchType = DISASM_BRANCH_CALL;
             disasm->instruction.addressValue = OSReadLittleInt16(disasm->bytes, 0x01);
             disasm->operand[0].immediateValue = disasm->instruction.addressValue;
+            disasm->operand[0].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
             break;
             
         case 0x4F:  // PCALL u
@@ -578,15 +583,35 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
 /// This is the string to be displayed in Hopper.
 - (void)buildInstructionString:(DisasmStruct *)disasm forSegment:(NSObject<HPSegment> *)segment populatingInfo:(NSObject<HPFormattedInstructionInfo> *)formattedInstructionInfo {
     
-    const char *spaces = "                ";
+    NSMutableString *output = [NSMutableString stringWithFormat:@"%-10s", disasm->instruction.mnemonic];
     
-    strcpy(disasm->completeInstructionString, disasm->instruction.mnemonic);
-    strcat(disasm->completeInstructionString, spaces + strlen(disasm->instruction.mnemonic));
     for (int i=0; i<DISASM_MAX_OPERANDS; i++) {
-        if (disasm->operand[i].mnemonic[0] == 0) break;
-        if (i) strcat(disasm->completeInstructionString, ", ");
-        strcat(disasm->completeInstructionString, disasm->operand[i].mnemonic);
+        if (strlen(disasm->operand[i].mnemonic) == 0)
+            break;
+        
+        if (i >= 1) {
+            [output appendString:@", "];
+        }
+        
+        NSString *temp = [[NSString alloc] initWithCString:disasm->operand[i].mnemonic encoding:NSUTF8StringEncoding];
+        
+        unsigned long long abs_mask = (DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE);
+        if ((disasm->operand[i].type & abs_mask) == abs_mask) {
+            ArgFormat format = [_file formatForArgument:i atVirtualAddress:disasm->instruction.addressValue];
+            
+            if (format == Format_Address || format == Format_Offset || format == Format_Default) {
+                NSString *name = [_file nameForVirtualAddress:disasm->instruction.addressValue];
+                
+                if (name != NULL) {
+                    temp = name;
+                }
+            }
+        }
+        
+        [output appendString:temp];
     }
+    
+    strncpy(disasm->completeInstructionString, [output cStringUsingEncoding:NSUTF8StringEncoding], DISASM_INSTRUCTION_MAX_LENGTH - 1);
 }
 
 // Decompiler
