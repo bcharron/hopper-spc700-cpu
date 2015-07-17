@@ -25,10 +25,7 @@
 
 #import "SPC700Ctx.h"
 #import "SPC700CPU.h"
-#import "opcodes.h"
 #import "opcodes2.h"
-
-extern spc700_opcode_t SPC700_OPCODES[];
 
 @implementation SPC700Ctx {
     SPC700CPU *_cpu;
@@ -198,54 +195,16 @@ extern spc700_opcode_t SPC700_OPCODES[];
     return(ret);
 }
 
-/*
-void do_a_zp(uint8_t opcode, DisasmStruct *disasm) {
-    strcpy(disasm->operand[0].mnemonic, "A");
-    disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
-    
-    disasm->operand[1].type = DISASM_OPERAND_ABSOLUTE;
-    snprintf(disasm->operand[1].mnemonic, 15, "$00%02X", disasm->bytes[1]);
-}
-
-void do_a_zp_plus_x(uint8_t opcode, DisasmStruct *disasm) {
-    do_zp(opcode, disasm);
-    strcat(disasm->operand[1].mnemonic, "+X");
-}
-*/
-
 // Dump and instruction and return its size in bytes
 int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
 {
     uint8 opcode = ram[0];
     opcode_t *op = NULL;
-    int x;
-    
-    // printf("%04X  ", pc);
-    
-    // XXX: Build a table indexed by opcode in Init() and use that instead of searching for every instruction.
-    for (x = 0; x < OPCODE_TABLE_LEN; x++) {
-        if (OPCODE_TABLE[x].opcode == opcode) {
-            op = &OPCODE_TABLE[x];
-            break;
-        }
-    }
-    
-    if (op == NULL) {
-        printf("Unknown opcode: 0x%02X\n", opcode);
-        return(1);
-    }
-    
-    /*
-    for (x = 0; x < op->len; x++)
-        printf("%02X ", ram[pc + x]);
-    
-    // Space padding
-    x = 5 - op->len;
-    while (x-- > 0)
-        printf("   ");
-    */
-    
     char str[128];
+    
+    op = &OPCODE_BY_NUMBER[opcode];
+
+    assert(op != NULL);
     
     switch(op->len) {
         case 1:
@@ -300,7 +259,6 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
             
     }
     
-    // printf("%s", str);
     strcpy(buf, str);
     
     str[0] = '\0';

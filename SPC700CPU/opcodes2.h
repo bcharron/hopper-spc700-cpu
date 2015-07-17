@@ -7,8 +7,9 @@ typedef struct opcode_s {
 	int len;
 } opcode_t;
 
-extern opcode_t OPCODE_TABLE[];
-extern int OPCODE_TABLE_LEN;
+// extern opcode_t OPCODE_TABLE[];
+extern opcode_t OPCODE_BY_NUMBER[];
+// extern int OPCODE_TABLE_LEN;
 
 // #define OPCODE_TABLE_LEN (sizeof(OPCODE_TABLE) / sizeof(opcode_t))
 
