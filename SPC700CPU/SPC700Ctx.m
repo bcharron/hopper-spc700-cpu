@@ -394,8 +394,15 @@ int dump_instruction(uint16 pc, const uint8 *ram, char *buf)
                 disasm->instruction.branchType = DISASM_BRANCH_JNS;
                 break;
 
-            case 0xFE: // BPL
-                disasm->instruction.branchType = DISASM_BRANCH_JE;
+            case 0xFE: // DBNZ Y, $xx
+                disasm->instruction.branchType = DISASM_BRANCH_JNE;
+                disasm->instruction.addressValue = disasm->virtualAddr + (sint8) disasm->bytes[1] + 2;
+                disasm->operand[0].type = DISASM_OPERAND_REGISTER_TYPE;
+                strcpy(disasm->operand[0].mnemonic, "Y");
+                
+                disasm->operand[1].immediateValue = disasm->instruction.addressValue;
+                disasm->operand[1].type = DISASM_OPERAND_CONSTANT_TYPE | DISASM_OPERAND_RELATIVE;
+                snprintf(disasm->operand[1].mnemonic, DISASM_OPERAND_MNEMONIC_MAX_LENGTH, "$%04llx", disasm->instruction.addressValue);
                 break;
                 
             case 0x2E: // CBNE $dp, $rr
